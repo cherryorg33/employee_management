@@ -59,6 +59,13 @@ CREATE TABLE users (
 
 
 
+--------------------
+manager register ---> http://localhost:5173/register -----------------> for manager regster
+login for both manager and employee ----> http://localhost:5173 --------->
+
+
+
+
 
 
 
