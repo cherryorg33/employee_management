@@ -14,6 +14,14 @@ export const registerManager = asyncHandler(async (req: Request, res: Response) 
     return res.status(400).json({ message: 'Email already registered' });
   }
 
+    // Check if manager count has reached the limit (max 10)
+  const [managerCountResult]: any = await pool.query('SELECT COUNT(*) as count FROM users WHERE role = "manager"');
+  const managerCount = managerCountResult[0]?.count || 0;
+
+  if (managerCount >= 10) {
+    return res.status(400).json({ message: 'Maximum limit of 10 managers reached' });
+  }
+
   const hashedPassword = await bcrypt.hash(password, 10);
 
   // Insert new manager into users table
