@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useAuth } from "../components/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -39,7 +40,6 @@ const ManagerDashboard = () => {
     handleSubmit,
     reset,
     setValue,
-    formState: { errors },
   } = useForm();
 
   useEffect(() => {
@@ -74,10 +74,24 @@ const ManagerDashboard = () => {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
+        toast.success('Employee updated successfully!', {
+          description: 'You can undo this action.',
+          action: {
+            label: 'Undo',
+            onClick: () => console.log('Undo clicked'),
+          },
+        });
       } else {
         await axios.post(`${config.BASE_URL}/api/manager/employees`, formData, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        toast.success('Employee added successfully!', {
+          description: 'You can undo this action.',
+          action: {
+            label: 'Undo',
+            onClick: () => console.log('Undo clicked'),
           },
         });
       }
@@ -88,6 +102,7 @@ const ManagerDashboard = () => {
       fetchEmployees(currentPage, search);
     } catch (error) {
       console.error("Error submitting form:", error);
+      toast.error('Something went wrong. Try again later.');
     }
   };
 
@@ -112,10 +127,7 @@ const ManagerDashboard = () => {
           description: 'You can undo this action.',
           action: {
             label: 'Undo',
-            onClick: () => {
-              // Perform undo logic here
-              console.log('Undo clicked');
-            },
+            onClick: () => console.log('Undo clicked'),
           },
         });
       } catch (error) {
@@ -125,12 +137,12 @@ const ManagerDashboard = () => {
   };
 
   return (
-    <div className="p-6">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+    <div className="p-4 sm:p-6">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <h2 className="text-2xl font-semibold">Manager Dashboard</h2>
-        <div className="flex gap-3 items-center">
-          <div className="relative">
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <div className="relative w-full sm:w-64">
             <input
               type="text"
               placeholder="Search..."
@@ -138,7 +150,7 @@ const ManagerDashboard = () => {
                 setSearch(e.target.value);
                 setCurrentPage(1);
               }}
-              className="pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <Search className="absolute left-2 top-2.5 h-5 w-5 text-gray-400" />
           </div>
@@ -148,22 +160,22 @@ const ManagerDashboard = () => {
               setIsEditing(false);
               setDrawerOpen(true);
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
             <Plus className="h-4 w-4" /> Add Employee
           </button>
           <button
             onClick={logout}
-            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
           >
             <LogOut className="h-4 w-4" /> Logout
           </button>
         </div>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-200 rounded-lg">
+      {/* Employee Table */}
+      <div className="overflow-x-auto w-full">
+        <table className="min-w-full bg-white border border-gray-200 rounded-lg text-sm">
           <thead className="bg-gray-100">
             <tr>
               <th className="text-left py-2 px-4 border-b">ID</th>
@@ -173,7 +185,7 @@ const ManagerDashboard = () => {
             </tr>
           </thead>
           <tbody>
-            {employees&& employees?.map((emp:any) => (
+            {employees && employees.map((emp: any) => (
               <tr key={emp.id} className="hover:bg-gray-50">
                 <td className="py-2 px-4 border-b">{emp.id}</td>
                 <td className="py-2 px-4 border-b">{emp.name}</td>
@@ -193,7 +205,7 @@ const ManagerDashboard = () => {
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-center mt-4 gap-2">
+      <div className="flex justify-center mt-4 gap-2 flex-wrap">
         <button
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           disabled={currentPage === 1}
@@ -225,10 +237,10 @@ const ManagerDashboard = () => {
         </button>
       </div>
 
-      {/* Drawer Form */}
+      {/* Drawer for Add/Edit Employee */}
       {drawerOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-end z-50">
-          <div className="bg-white w-full max-w-sm p-6 h-full shadow-lg overflow-auto">
+          <div className="bg-white w-full max-w-sm p-4 sm:p-6 h-full shadow-lg overflow-auto">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-semibold">
                 {isEditing ? "Edit Employee" : "Add New Employee"}
@@ -281,3 +293,4 @@ const ManagerDashboard = () => {
 };
 
 export default ManagerDashboard;
+

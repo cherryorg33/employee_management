@@ -1,9 +1,10 @@
-import React from 'react';
+// import React from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../components/AuthContext';
 import { useForm } from 'react-hook-form';
 import { config } from '../config';
+import { toast } from 'sonner';
 
 type FormData = {
   email: string;
@@ -19,10 +20,29 @@ const Login = () => {
     try {
       const response = await axios.post(`${config.BASE_URL}/api/auth/login`, data);
       login(response.data.token, response.data.role);
-      
+      toast.success('Login successfully!', {
+        description: 'You can undo this action.',
+        action: {
+          label: 'Undo',
+          onClick: () => {
+            // Perform undo logic here
+            console.log('Undo clicked');
+          },
+        },
+      });
+
       navigate(response.data.role === 'manager' ? '/manager' : '/employee');
     } catch (error) {
-      alert('Invalid credentials');
+      toast.success('Invalid Credentials', {
+        description: 'You can undo this action.',
+        action: {
+          label: 'Undo',
+          onClick: () => {
+            // Perform undo logic here
+            console.log('Undo clicked');
+          },
+        },
+      });
     }
   };
 
@@ -36,6 +56,7 @@ const Login = () => {
             <input
               type="email"
               placeholder="you@example.com"
+              required
               {...register('email', { required: 'Email is required' })}
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -57,8 +78,14 @@ const Login = () => {
           >
             Login
           </button>
+          <div className="">
+            New Manager 
+            <Link to="/register" className="text-blue-600 underline hover:text-blue-800 ml-2">
+               Register Here
+            </Link>
+          </div>
         </form>
-      
+
       </div>
     </div>
   );

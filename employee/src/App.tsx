@@ -1,5 +1,5 @@
 // App.tsx
-import React from 'react';
+// import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import RegisterManager from './pages/RegisterManager';
