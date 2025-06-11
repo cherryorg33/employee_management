@@ -60,6 +60,26 @@ export const addEmployee = asyncHandler(async (req: Request, res: Response) => {
   const { name, email, password } = req.body;
   const managerId = req.user?.id;
 
+   // 1. Check if the email already exists
+  const [existingEmail]: any = await pool.query(
+    'SELECT * FROM users WHERE email = ?',
+    [email]
+  );
+  if (existingEmail.length > 0) {
+    return res.status(400).json({ message: 'Email is already registered' });
+  }
+
+  // 2. Check if the manager already has 20 employees
+  const [employeeCountResult]: any = await pool.query(
+    'SELECT COUNT(*) as count FROM users WHERE role = "employee" AND manager_id = ?',
+    [managerId]
+  );
+  const employeeCount = employeeCountResult[0]?.count || 0;
+
+  if (employeeCount >= 20) {
+    return res.status(400).json({ message: 'Maximum limit of 20 employees reached for this manager' });
+  }
+
   const hashedPassword = await bcrypt.hash(password, 10);
 
   await pool.query(
