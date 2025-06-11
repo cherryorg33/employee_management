@@ -66,7 +66,7 @@ login for both manager and employee ----> http://localhost:5173 --------->
 
 
 
-
+mysql://root:tLqbbSTMEiyafEakMxQsFEDAgdKkbwyQ@mysql.railway.internal:3306/railway
 
 
 
