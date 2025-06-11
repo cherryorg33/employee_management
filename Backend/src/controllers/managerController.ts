@@ -8,12 +8,35 @@ import { pool } from '../config/database';
 export const getMyEmployees = asyncHandler(async (req: Request, res: Response) => {
   const managerId = req.user?.id;
 
-  const [rows]: any = await pool.query(
-    'SELECT id, name, email FROM users WHERE role = "employee" AND manager_id = ?',
-    [managerId]
-  );
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 5;
+  const search = (req.query.search as string) || "";
 
-  res.json(rows);
+  const offset = (page - 1) * limit;
+
+  try {
+    // Get total count
+    const [countRows]: any = await pool.query(
+      `SELECT COUNT(*) as total FROM users WHERE role = 'employee' AND manager_id = ? AND (name LIKE ? OR email LIKE ?)`,
+      [managerId, `%${search}%`, `%${search}%`]
+    );
+    const totalEmployees = countRows[0].total;
+    const totalPages = Math.ceil(totalEmployees / limit);
+
+    // Get paginated results
+    const [rows]: any = await pool.query(
+      `SELECT id, name, email FROM users WHERE role = 'employee' AND manager_id = ? AND (name LIKE ? OR email LIKE ?) ORDER BY id DESC LIMIT ? OFFSET ?`,
+      [managerId, `%${search}%`, `%${search}%`, limit, offset]
+    );
+
+    res.json({
+      employees: rows,
+      totalPages,
+      currentPage: page,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch employees", error });
+  }
 });
 
 export const getEmployeeDetails = asyncHandler(async (req: Request, res: Response) => {
